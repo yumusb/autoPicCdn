@@ -14,5 +14,5 @@ define("TOKEN","YourToken");
 ``` 
 
 就可以享受白嫖带来的乐趣了!  
-如果有帮助到你 欢迎赞赏 
+如果有帮助到你 欢迎赞赏  
 ![zanshang](https://ae01.alicdn.com/kf/H512c765e75bf4e01b91f1771ff69a8d2o.png) 
