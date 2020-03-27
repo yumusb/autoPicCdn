@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-cn">
 <head>
@@ -122,20 +123,21 @@
         }
         r = new FileReader(); //本地预览
         r.onload = function() {
-          base64 = r.result;
-          ext = base64.split("/")[1].split(";")[0];
-          base64 = base64.split(",")[1];
+          let formdata=new FormData; //创建FormData对象,代表文件传输
+          formdata.append("pic", file);
           $.ajax({
             type: "post",
-            url: "./up.php",
+            url: "./up",
+            processData:false, //不让指定数据处理方式
+            contentType:false, //不让指定传输格式
             dataType: "json",
-            data: { ext: ext, content: base64 },
+            data: formdata,
             async: true,
             success: function(res) {
-              if (res.code == 200) {
+              if (res.code == 'success') {
                 $(".container-fluid .row-fluid .textarea_con").html(
                   '<textarea id="url-res-txt" class="form-control" rows="3" style="margin-top: 10px;background-color: #ececec;">' +
-                    res.url +
+                    res.data.url +
                     "</textarea>"
                 );
               } else {

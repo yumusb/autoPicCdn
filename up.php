@@ -1,5 +1,12 @@
 <?php
 /*
+ * @Author: yumusb
+ * @Date: 2020-03-27 14:45:07
+ * @LastEditors: yumusb
+ * @LastEditTime: 2020-03-27 14:45:34
+ * @Description: 
+ */
+/*
 URL https://github.com/yumusb/autoPicCdn
 */
 
@@ -40,24 +47,24 @@ function upload($url, $content)
     return $chContents;
 }
 
-$ext=trim($_POST['ext']);
-$content=trim($_POST['content']);
-
-if($ext!="" && $content !=""){
-    $filename=date('Y').'/'.date('m').'/'.date('d').'/'.md5(time()).".png";
-    $url="https://api.github.com/repos/".USER."/".REPO."/contents/".$filename;
-    $res=json_decode(upload($url,$content),true);
-    if($res['content']['path']!=""){
-        $return['code']=200;
-        $return['url']='https://cdn.jsdelivr.net/gh/'.USER.'/'.REPO.'@master/'.$res['content']['path'];
-    }else{
-        $return['code']=500;
-        $return['url']=null;
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_FILES["pic"]["error"] <= 0) {
+    $filename = date('Y') . '/' . date('m') . '/' . date('d') . '/' . md5(time()) . ".png";
+    $url = "https://api.github.com/repos/" . USER . "/" . REPO . "/contents/" . $filename;
+    $tmpName = './tmp' . md5($filename);
+    move_uploaded_file($_FILES['pic']['tmp_name'], $tmpName);
+    $content = base64_encode(file_get_contents($tmpName));
+    $res = json_decode(upload($url, $content), true);
+    unlink($tmpName);
+    if ($res['content']['path'] != "") {
+        $return['code'] = 'success';
+        $return['data']['filename'] = $filename;
+        $return['data']['url'] = 'https://cdn.jsdelivr.net/gh/' . USER . '/' . REPO . '@master/' . $res['content']['path'];
+    } else {
+        $return['code'] = 500;
+        $return['url'] = null;
     }
-}else{
-    $return['code']=404;
-    $return['url']=null;
+} else {
+    $return['code'] = 404;
+    $return['url'] = null;
 }
-
-
 exit(json_encode($return));
