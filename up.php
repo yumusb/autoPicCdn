@@ -13,10 +13,10 @@ URL https://github.com/yumusb/autoPicCdn
 error_reporting(0);
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set("PRC");
-define("REPO","testforapi");//必须是下面用户名下的公开仓库
-define("USER","yumusb");//必须是当前GitHub用户名
-define("MAIL","yumusb@foxmail.com");//
-define("TOKEN","YourToken");//https://github.com/settings/tokens 去这个页面生成一个有写权限的token（write:packages前打勾）
+define("REPO","repo");//必须是下面用户名下的公开仓库
+define("USER","username");//必须是当前GitHub用户名
+define("MAIL","mail@foxmail.com");//
+define("TOKEN","token");//https://github.com/settings/tokens 去这个页面生成一个有写权限的token（write:packages前打勾）
 
 function upload($url, $content)
 {
@@ -46,25 +46,32 @@ function upload($url, $content)
     curl_close($ch);
     return $chContents;
 }
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_FILES["pic"]["error"] <= 0) {
-    $filename = date('Y') . '/' . date('m') . '/' . date('d') . '/' . md5(time()) . ".png";
-    $url = "https://api.github.com/repos/" . USER . "/" . REPO . "/contents/" . $filename;
-    $tmpName = './tmp' . md5($filename);
-    move_uploaded_file($_FILES['pic']['tmp_name'], $tmpName);
-    $content = base64_encode(file_get_contents($tmpName));
-    $res = json_decode(upload($url, $content), true);
-    unlink($tmpName);
-    if ($res['content']['path'] != "") {
-        $return['code'] = 'success';
-        $return['data']['filename'] = $filename;
-        $return['data']['url'] = 'https://cdn.jsdelivr.net/gh/' . USER . '/' . REPO . '@master/' . $res['content']['path'];
-    } else {
-        $return['code'] = 500;
-        $return['url'] = null;
-    }
-} else {
-    $return['code'] = 404;
+if(isset($_FILES['file']) { 
+  if($_FILES['file']['size'] > 1048576) { //判断文件大小
+    $return['code'] = 500;
     $return['url'] = null;
+  } 
+  else { 
+	if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_FILES["pic"]["error"] <= 0) {
+		$filename = date('Y') . '/' . date('m') . '/' . date('d') . '/' . substr(md5(time()) , 0 , 6) . ".png";
+		$url = "https://api.github.com/repos/" . USER . "/" . REPO . "/contents/" . $filename;
+		$tmpName = './tmp' . md5($filename);
+		move_uploaded_file($_FILES['pic']['tmp_name'], $tmpName);
+		$content = base64_encode(file_get_contents($tmpName));
+		$res = json_decode(upload($url, $content), true);
+		unlink($tmpName);
+		if ($res['content']['path'] != "") {
+			$return['code'] = 'success';
+			$return['data']['filename'] = $filename;
+			$return['data']['url'] = 'https://cdn.jsdelivr.net/gh/' . USER . '/' . REPO . '/' . $res['content']['path'];
+		} else {
+			$return['code'] = 500;
+			$return['url'] = null;
+		}
+	} else {
+		$return['code'] = 404;
+		$return['url'] = null;
+	}
+	exit(json_encode($return));
+  } 
 }
-exit(json_encode($return));
