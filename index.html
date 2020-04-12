@@ -95,7 +95,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-body">
-				<textarea name="urls" class="form-control" id="urls" rows="3"></textarea>
+				<textarea name="urls" class="form-control" id="urls" rows="8"></textarea>
 			</div>
 			<div class="modal-footer">
 			</div>
@@ -130,7 +130,7 @@
             success: function(res) {
               if (res.code == 'success') {
                 $(".container-fluid .row-fluid .textarea_con").html(
-                  '<textarea id="url-res-txt" class="form-control" rows="3" style="margin-top: 10px;background-color: #ececec;">' + document.getElementById("url-res-txt").value +
+                  '<textarea id="url-res-txt" class="form-control" rows="8" style="margin-top: 10px;background-color: #ececec;">' + document.getElementById("url-res-txt").value +
                     res.data.url + "\n" +
                     "</textarea>"
                 );
