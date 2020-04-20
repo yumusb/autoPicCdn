@@ -6,11 +6,12 @@
 
 ```
 .
-├── index.html # 简单上传页面
+├── index.html # 前端首页
+├── pic.sql # SQL语句用以创建数据表
 ├── README.md 
-└── up.php # 上传接口，需要能访问github，建议放到非大陆服务器
+├── static # 静态文件夹
+└── up.php #接口文件
 
-0 directories, 3 files
 
 ```
 
@@ -29,7 +30,7 @@
 就可以享受白嫖带来的乐趣了!  
 
 更新记录:
-
++ 2020.04.21 换了一套前端，同时支持数据库记录文件Md5，相同md5文件第二次上传会直接从数据库调用。
 + 2020.03.27 重写交互方式，且现已支持`PicGo`中的`web-uploader`插件（Zqian）,配置API地址就写up.php的地址，POST参数填写`pic`
 
   

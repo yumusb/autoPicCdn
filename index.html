@@ -1,162 +1,108 @@
-
 <!DOCTYPE html>
 <html lang="zh-cn">
 <head>
-<meta name="referrer" content="no-referrer"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
-<title>图床</title>
-<link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"/>
-<script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js" type="text/javascript"></script>
-<style type="text/css">
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial, sans-serif;
-        background: #333;
-      }
-      @font-face {
-        font-family: webfont_2;
-      }
-      .text-center {
-        text-align: center;
-      }
-      .text-white {
-        color: #fff;
-      }
-      .footer,
-      .header {
-        margin: 30px;
-        color: #fff;
-      }
-      .title1 {
-        font-size: 20px;
-      }
-      .title2 {
-        font-size: 24px;
-        font-family: webfont_2 !important;
-      }
-      .jumbotron {
-        margin: auto;
-        text-align: center;
-        background-color: rgba(255, 255, 255, 0.3);
-      }
-      .jumbotron input[type="file"] {
-        opacity: 0;
-        width: 102px;
-        height: 31px;
-        position: absolute;
-        display: inline-block;
-      }
-      .preview {
-        color: #fff;
-      }
-      .preview img {
-        max-width: 10%;
-      }
-      .preview p {
-        word-break: break-all;
-        word-wrap: break-word;
-        font-size: 13px !important;
-      }
-</style>
+	<meta charset="utf-8" />
+	<title>图床</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./static/layui/css/layui.css">
+    <link rel="stylesheet" href="./static/css/mystyle.css">
+    <script src="./static/js/jquery.min.js"></script>
+    <script src="./static/js/Message.js"></script>
+	<link rel="icon" href="/static/images/favicon.png" />
 </head>
 <body>
-<div class="container-fluid">
-	<div class="row-fluid">
-		<div class="span12 header text-center">
-			<p class="title2">
-				图床
-			</p>
-		</div>
-		<div class="col-md-8 col-xs-10 jumbotron" style="margin: auto;">
-			<div class="mselector">
-				<input type="file" name="upimage" id="upload_file" accept="image/*"/>
-				<button class="btn btn-primary btn-sm" type="button">
-              选择本地图片
-				</button>
-			</div>
-			<hr/>
-			<div class="textarea_con">
-				<textarea class="form-control" id="url-res-txt" style="margin-top: 10px;background-color: #ececec;" rows="3">
-上传后复制此处URL
-				</textarea>
-			</div>
-			<div class="preview">
-				<hr/>
-			</div>
-		</div>
-		<div class="footer text-center">
-			<p style="color: #ececec;">
-            仅支持单文件,大小限制2MB,本站图床存储于
-				<a href="https://github.com/">Github</a>且由<a href="https://www.jsdelivr.com/">Jsdelivr</a>提供全球CDN加速<br/>项目地址:
-				<a href="https://github.com/yumusb/autoPicCdn">
-              https://github.com/yumusb/autoPicCdn
-				</a>
-			</p>
-		</div>
-	</div>
+    <div id="left-gg"></div>
+    <div id="right-gg"></div>
+    <div class="header">
+        <div class="layui-container">
+            <div class="layui-row">
+                <div class="layui-col-lg12">
+                    
+                    <div class="layui-hide-xs menu">
+                        <ul class="layui-nav" lay-filter="">
+                            <li class="layui-nav-item"><a id="alert2"><i class="layui-icon"></i> 使用协议</a></li>
+                        <span class="layui-nav-bar"></span></ul>
+                    </div>
+                    <div class="menu layui-hide-lg layui-hide-md layui-hide-sm">
+                        <ul class="layui-nav" lay-filter="">
+                            <li class="layui-nav-item"><a id="alert"><i class="layui-icon"></i> 使用协议</a></li>
+                        <span class="layui-nav-bar" style="left: 62.9375px; top: 55px; width: 0px; opacity: 0;"></span></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 顶部导航栏END --><div class="layui-container">
+    <div class="layui-row">
+        <!-- 首页主要区域 -->
+        <div class="layui-col-lg12">
+            <div id="main">
+                <div class="alert alert-warning" role="alert">
+                    <span class="alert-inner--icon"><i class="layui-icon"></i></span>
+                    <span class="alert-inner--text">仅支持单文件,大小限制2MB,本站图床存储于<a style="color: red;" href="https://github.com/">Github</a>且由<a style="color: red;" href="https://www.jsdelivr.com/">Jsdelivr</a>提供全球CDN加速 &nbsp;&nbsp; 项目地址:<a style="color: red;" href="https://github.com/yumusb/autoPicCdn">https://github.com/yumusb/autoPicCdn</a> &nbsp;&nbsp; <a style="color: red;" href="http://33.al/donate">捐赠</a>
+			
+		</span>
+                </div>
+                <!-- 上传区域 -->
+                <div class="layui-form-item">
+                <div class="layui-upload-drag" id="upimg" name="pic">
+                    <i class="layui-icon"></i>
+                    <p>点击上传，或拖拽图片至此</p>
+                </div>
+                </div>
+                <!-- 上传区域END -->
+            </div>
+        </div>
+        <!-- 首页主要区域END -->
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-lg12">
+            <!-- 上传进度条 -->
+            <div class = "progress">
+                <div class="layui-progress layui-progress-big" lay-filter="uploadProgress" lay-showPercent="true">
+                    <div class="layui-progress-bar" lay-percent="0%"></div>
+                </div>
+            </div>
+            <!-- 上传进度条END -->
+        </div>
+        <div class="layui-col-lg12" id = "imgshow">
+            <!-- 图片显示区域 -->
+            <!-- 显示缩略图 -->
+            <div class="layui-col-lg4">
+                <div id = "img-thumb" style="padding-top: 1em;"><img src="" alt="查看详情"></div>
+            </div>
+            <!-- 显示地址 -->
+            <div class="layui-col-lg7 layui-col-md-offset1">
+                <div id="links">
+                    <table class="layui-table" lay-skin="nob" lay-size="sm">
+                        <colgroup>
+                            <col width="100">
+                            <col width="450">
+                            <col>
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <td>UBB</td>
+                                <td><input type="text" class="layui-input" id="bbcode" data-cip-id="bbcode"></td>
+                                <td><a href="javascript:;" class="layui-btn layui-btn-sm" onclick="copyurl('bbcode')">复制</a></td>
+                            </tr>
+                            <tr>
+                                <td>URL</td>
+                                <td><input type="text" class="layui-input" id="url" data-cip-id="url"></td>
+                                <td><a href="javascript:;" class="layui-btn layui-btn-sm" onclick="copyurl('url')">复制</a></td>
+                            </tr>							
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 图片显示区域END -->
+        </div>
+    </div>
 </div>
-<div tabindex="-1" class="modal fade" id="url_upload_model" role="dialog" aria-hidden="true" aria-labelledby="myModalLabel">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-body">
-				<textarea name="urls" class="form-control" id="urls" rows="3"></textarea>
-			</div>
-			<div class="modal-footer">
-			</div>
-		</div>
-	</div>
-</div>
-<script type="text/javascript">
-      $("input[type='file']").change(function(e) {
-        gen_base64();
-      });
-      function $_(id) {
-        return document.getElementById(id);
-      }
-      function gen_base64() {
-        var file = $_("upload_file").files[0];
-        if (!/image\/\w+/.test(file.type)) {
-          alert("请确保文件为图像类型");
-          return false;
-        }
-        r = new FileReader(); //本地预览
-        r.onload = function() {
-          let formdata=new FormData; //创建FormData对象,代表文件传输
-          formdata.append("pic", file);
-          $.ajax({
-            type: "post",
-            url: "./up.php",
-            processData:false, //不让指定数据处理方式
-            contentType:false, //不让指定传输格式
-            dataType: "json",
-            data: formdata,
-            async: true,
-            success: function(res) {
-              if (res.code == 'success') {
-                $(".container-fluid .row-fluid .textarea_con").html(
-                  '<textarea id="url-res-txt" class="form-control" rows="3" style="margin-top: 10px;background-color: #ececec;">' +
-                    res.data.url +
-                    "</textarea>"
-                );
-              } else {
-                alert("fail");
-              }
-            },
-            error: function(a) {
-              alert("失败");
-            }
-          });
-        };
-        r.readAsDataURL(file); //Base64
-      }
-      window.onload = function() {
-        if (typeof FileReader === "undefined") {
-          alert("抱歉，你的浏览器不支持 FileReader，请使用现代浏览器操作！");
-          $_("upload_file").disabled = true;
-        }
-      };
-    </script>
+	<script src="./static/layui/layui.js"></script>
+	<script src="./static/js/embed.js"></script>
+	<script src="./static/js/clipBoard.min.js"></script>
+	<script> document.getElementById('alert').onclick = function () { alert('<ul><li>不得上传色情、暴力、政治的内容</li><li>不得上传侵犯版权、隐私权的内容</li><li>违反规定直接删除图片不另行通知</li><li>所有图片仅供网站内部使用</li></ul>') } </script>
+	<script> document.getElementById('alert2').onclick = function () { alert('<ul><li>不得上传色情、暴力、政治的内容</li><li>不得上传侵犯版权、隐私权的内容</li><li>违反规定直接删除图片不另行通知</li><li>所有图片仅供网站内部使用</li></ul>') } </script>
 </body>
 </html>

@@ -18,6 +18,19 @@ define("USER","yumusb");//必须是当前GitHub用户名
 define("MAIL","yumusb@foxmail.com");//
 define("TOKEN","YourToken");//https://github.com/settings/tokens 去这个页面生成一个有写权限的token（write:packages前打勾）
 
+function GetIP(){ 
+	if (getenv("HTTP_CLIENT_IP") && strcasecmp(getenv("HTTP_CLIENT_IP"), "unknown")) 
+	$ip = getenv("HTTP_CLIENT_IP"); 
+	else if (getenv("HTTP_X_FORWARDED_FOR") && strcasecmp(getenv("HTTP_X_FORWARDED_FOR"), "unknown")) 
+	$ip = getenv("HTTP_X_FORWARDED_FOR"); 
+	else if (getenv("REMOTE_ADDR") && strcasecmp(getenv("REMOTE_ADDR"), "unknown")) 
+	$ip = getenv("REMOTE_ADDR"); 
+	else if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], "unknown")) 
+	$ip = $_SERVER['REMOTE_ADDR']; 
+	else
+	$ip = "unknow"; 
+	return($ip); 
+}
 function upload($url, $content)
 {
     $ch = curl_init();
@@ -47,24 +60,58 @@ function upload($url, $content)
     return $chContents;
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_FILES["pic"]["error"] <= 0) {
-    $filename = date('Y') . '/' . date('m') . '/' . date('d') . '/' . md5(time()) . ".png";
+//数据库配置文件
+$database = array(
+		'dbname' => 'pic',
+		'host' => 'localhost',
+		'port' => 3306,
+		'user' => 'pic',
+		'pass' => '123456',
+	);
+	
+try {
+	$db = new PDO("mysql:dbname=" . $database['dbname'] . ";host=" . $database['host'] . ";" . "port=" . $database['port'] . ";", $database['user'], $database['pass'], array(PDO::MYSQL_ATTR_INIT_COMMAND => "set names utf8"));
+} catch (PDOException $e) {
+	die("数据库出错，请检查 up.php中的database配置项.<br> " . $e->getMessage() . "<br/>");
+}
+
+$table = 'remote_imgs'; //表名字
+
+/* 创建表
+CREATE TABLE `pic`.`remote_imgs` ( `imgmd5` VARCHAR(32) NOT NULL COMMENT '文件md5' , `imguploadtime` INT(10) NOT NULL COMMENT '上传时间，10位时间戳' , `imguploadip` VARCHAR(20) NOT NULL COMMENT '上传IP' , `imgurl` VARCHAR(200) NOT NULL COMMENT '远程访问URL' , PRIMARY KEY (`imgmd5`)) ENGINE = InnoDB COMMENT = '图片统计表';
+*/
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_FILES["pic"]["error"] <= 0 && $_FILES["pic"]["size"] >100 ) {
+    $filename = date('Y') . '/' . date('m') . '/' . date('d') . '/' . md5(time().mt_rand(10,1000)) . ".png";
     $url = "https://api.github.com/repos/" . USER . "/" . REPO . "/contents/" . $filename;
     $tmpName = './tmp' . md5($filename);
     move_uploaded_file($_FILES['pic']['tmp_name'], $tmpName);
-    $content = base64_encode(file_get_contents($tmpName));
-    $res = json_decode(upload($url, $content), true);
+    $filemd5 = md5_file($tmpName);
+    $row = $db->query("SELECT `imgurl` FROM `{$table}` WHERE `imgmd5`= '{$filemd5}' ")->fetch(PDO::FETCH_ASSOC);
+    if($row){
+    	$remoteimg=$row['imgurl'];
+    }else{
+    	$content = base64_encode(file_get_contents($tmpName));
+    	$res = json_decode(upload($url, $content), true);
+		if($res['content']['path'] != ""){
+			$remoteimg = 'https://cdn.jsdelivr.net/gh/' . USER . '/' . REPO . '@latest/' . $res['content']['path'];
+	    	$tmp = $db->prepare("INSERT INTO `{$table}`(`imgmd5`, `imguploadtime`, `imguploadip`,`imgurl`) VALUES (?,?,?,?)");
+	    	$tmp->execute(array($filemd5, time(), GetIP(), $remoteimg));
+		}
+    }
     unlink($tmpName);
-    if ($res['content']['path'] != "") {
+    if ($remoteimg != "") {
         $return['code'] = 'success';
-        $return['data']['filename'] = $filename;
-        $return['data']['url'] = 'https://cdn.jsdelivr.net/gh/' . USER . '/' . REPO . '@master/' . $res['content']['path'];
+        $return['data']['url'] = $remoteimg;
+        $return['data']['filemd5'] = $filemd5;
     } else {
         $return['code'] = 500;
+        $return['msg'] = '上传失败，我们会尽快修复';
         $return['url'] = null;
     }
 } else {
     $return['code'] = 404;
+    $return['msg'] = '无法识别你的文件';
     $return['url'] = null;
 }
 exit(json_encode($return));
