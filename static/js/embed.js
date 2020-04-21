@@ -26,6 +26,7 @@ layui.use(['upload','form','element','layer','flow'], function(){
 			,choose: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
                 this.url = './up.php';
                 this.field = 'pic';
+                console.log(this);
                 $(".progress").hide();
                 //console.log(this.url);
             }
@@ -40,23 +41,7 @@ layui.use(['upload','form','element','layer','flow'], function(){
                 //console.log(res);
                 //上传完毕回调
                 //如果上传失败
-                if(res.code != 'success'){
-                    layer.open({
-                        title: '温馨提示'
-                        ,content: res.msg
-                    });  
-                    layer.closeAll('loading');  
-                }
-                else{
-                    layer.closeAll('loading'); 
-                    $("#img-thumb a").attr('href',res.data.url);
-                    $("#img-thumb img").attr('src',res.data.url);
-                    $("#url").val(res.data.url);
-                    $("#html").val("<img src = '" + res.data.url + "' />");
-                    $("#markdown").val("![](" + res.data.url + ")");
-                    $("#bbcode").val("[img]" + res.data.url + "[/img]");
-                    $("#imgshow").show();
-                }
+                handleres(res);
 			}
 			,error: function(){
                 //请求异常回调
@@ -66,7 +51,33 @@ layui.use(['upload','form','element','layer','flow'], function(){
         //单文件上传END
 
 });
+function handleres(res,index){
+    layui.use('layer', function(){
+        var layer = layui.layer;
+        if(res.code != 'success'){
+            layer.open({
+                title: '温馨提示'
+                ,content: res.msg
+            });  
+            layer.closeAll('loading');
+            
+        }
+        else{
+            layer.closeAll('loading'); 
+            $("#img-thumb a").attr('href',res.data.url);
+            $("#img-thumb img").attr('src',res.data.url);
+            $("#url").val(res.data.url);
+            $("#html").val("<img src = '" + res.data.url + "' />");
+            $("#markdown").val("![](" + res.data.url + ")");
+            $("#bbcode").val("[img]" + res.data.url + "[/img]");
+            $("#imgshow").show();
+            
+        }
 
+
+    }); 
+
+}
 
 //复制链接
 //复制链接
@@ -84,31 +95,19 @@ function copyurl(info){
     });
     layui.use('layer', function(){
           var layer = layui.layer;
-      
           layer.msg('链接已复制！', {time: 2000,icon:1})
     }); 
 }
 
 
-//显示图片操作按钮
-function show_imgcon(id){
-    $("#imgcon" + id).show();
-}
-//隐藏图片操作按钮
-function hide_imgcon(id){
-    $("#imgcon" + id).hide();
-}
-
 //显示图片链接
-function showlink(url,thumburl){
+function showlink(url){
     layer.open({
         type: 1,
         title: false,
         content: $('#imglink'),
         area: ['680px', '500px']
     });
-    $("#img-thumb a").attr('href', thumburl);
-    $("#img-thumb img").attr('src',thumburl);
     $("#url").val(url);
     $("#html").val("<img src = '" + url + "' />");
     $("#markdown").val("![](" + url + ")");
@@ -117,16 +116,70 @@ function showlink(url,thumburl){
 }
 
 
-/**
- * 创建并下载文件
- * @param  {String} fileName 文件名
- * @param  {String} content  文件内容
- */
-function createAndDownloadFile(fileName, content) {
-    var aTag = document.createElement('a');
-    var blob = new Blob([content]);
-    aTag.download = fileName;
-    aTag.href = URL.createObjectURL(blob);
-    aTag.click();
-    URL.revokeObjectURL(blob);
-}
+document.addEventListener('paste', function (event) {
+    var isChrome = false;
+    if ( event.clipboardData || event.originalEvent ) {
+        var clipboardData = (event.clipboardData || event.originalEvent.clipboardData);
+        if ( clipboardData.items ) {
+            // for chrome
+            var  items = clipboardData.items,
+                len = items.length,
+                blob = null;
+            isChrome = true;
+
+            event.preventDefault();
+
+            let images = [];
+            for (var i = 0; i < len; i++) {
+                if (items[i].type.indexOf("image") !== -1) {
+                    blob = items[i].getAsFile();
+                    images.push(blob);
+                }
+            }
+            if(images.length > 0) {
+                layer.confirm('是否上传粘贴板文件？', function(index){
+                    layer.load();
+                    var formData = new FormData();
+                    formData.append('pic', images[0]);
+                    $.ajax({
+                        url: './up.php',
+                        data: formData,
+                        type: 'post',
+                        processData: false,
+                        contentType: false,
+                        dataType: 'json',
+                        success: function (data) {
+                            
+                            handleres(data);
+                        },
+                        error: function (xOptions, textStatus) {
+                            return;
+                        }
+                        
+                    });
+                  layer.close(index);
+                });  
+                // layer.confirm('', {
+                //   btn: ['立马上传', '按错了'] //可以无限个按钮
+                // }, function(index, layero){
+
+                  
+
+                // }, function(index){
+                //   console.log("取消上传");
+                // });
+                //layer.close(layer.index);
+            }
+            if ( blob !== null ) {
+                let reader = new FileReader();
+                reader.onload = function (event) {
+                    let base64_str = event.target.result;
+                }
+
+            }
+        } else {
+            //for firefox
+        }
+    } else {
+    }
+});

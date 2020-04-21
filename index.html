@@ -45,9 +45,10 @@
                 </div>
                 <!-- 上传区域 -->
                 <div class="layui-form-item">
-                <div class="layui-upload-drag" id="upimg" name="pic">
+                
+<div class="layui-upload-drag" id="upimg" name="pic">
                     <i class="layui-icon"></i>
-                    <p>点击上传，或拖拽图片至此</p>
+                    <p>点击上传，亦或者粘贴(Ctrl+V)图片</p>
                 </div>
                 </div>
                 <!-- 上传区域END -->
@@ -82,15 +83,20 @@
                         </colgroup>
                         <tbody>
                             <tr>
+                                <td>URL</td>
+                                <td><input type="text" class="layui-input" id="url" data-cip-id="url"></td>
+                                <td><a href="javascript:;" class="layui-btn layui-btn-sm" onclick="copyurl('url')">复制</a></td>
+                            </tr>                            
+                            <tr>
                                 <td>UBB</td>
                                 <td><input type="text" class="layui-input" id="bbcode" data-cip-id="bbcode"></td>
                                 <td><a href="javascript:;" class="layui-btn layui-btn-sm" onclick="copyurl('bbcode')">复制</a></td>
                             </tr>
                             <tr>
-                                <td>URL</td>
-                                <td><input type="text" class="layui-input" id="url" data-cip-id="url"></td>
-                                <td><a href="javascript:;" class="layui-btn layui-btn-sm" onclick="copyurl('url')">复制</a></td>
-                            </tr>							
+                                <td>markdown</td>
+                                <td><input type="text" class="layui-input" id="markdown" data-cip-id="markdown"></td>
+                                <td><a href="javascript:;" class="layui-btn layui-btn-sm" onclick="copyurl('markdown')">复制</a></td>
+                            </tr>                            							
                         </tbody>
                     </table>
                 </div>
@@ -99,10 +105,10 @@
         </div>
     </div>
 </div>
-	<script src="./static/layui/layui.js"></script>
-	<script src="./static/js/embed.js"></script>
-	<script src="./static/js/clipBoard.min.js"></script>
-	<script> document.getElementById('alert').onclick = function () { alert('<ul><li>不得上传色情、暴力、政治的内容</li><li>不得上传侵犯版权、隐私权的内容</li><li>违反规定直接删除图片不另行通知</li><li>所有图片仅供网站内部使用</li></ul>') } </script>
-	<script> document.getElementById('alert2').onclick = function () { alert('<ul><li>不得上传色情、暴力、政治的内容</li><li>不得上传侵犯版权、隐私权的内容</li><li>违反规定直接删除图片不另行通知</li><li>所有图片仅供网站内部使用</li></ul>') } </script>
+<script src="./static/layui/layui.js"></script>
+    <script src="./static/js/embed.js"></script>
+    <script src="./static/js/clipBoard.min.js"></script>
+    <script> document.getElementById('alert').onclick = function () { alert('<ul><li>不得上传色情、暴力、政治的内容</li><li>不得上传侵犯版权、隐私权的内容</li><li>违反规定直接删除图片不另行通知</li><li>所有图片仅供网站内部使用</li></ul>') } </script>
+    <script> document.getElementById('alert2').onclick = function () { alert('<ul><li>不得上传色情、暴力、政治的内容</li><li>不得上传侵犯版权、隐私权的内容</li><li>违反规定直接删除图片不另行通知</li><li>所有图片仅供网站内部使用</li></ul>') } </script>	
 </body>
 </html>

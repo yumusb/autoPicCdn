@@ -19,7 +19,7 @@
 
 配置选项
 
-> https://github.com/settings/tokens 去这个页面生成一个有写权限的token（write:packages前打勾）然后配置up.php中的相关字段..
+> https://github.com/settings/tokens 去这个页面生成一个有写权限的token（repo：Full control of private repositories 和write:packages前打勾）然后配置up.php中的相关字段..
 >
 > ```php
 > define("REPO","testforapi");//必须是下面用户名下的公开仓库
@@ -39,6 +39,7 @@
 就可以享受白嫖带来的乐趣了!  
 
 更新记录:
++ 2020.04.21 优化交互提示，添加粘贴板上传（Chrome）。
 + 2020.04.21 换了一套前端，同时支持数据库记录文件Md5，相同md5文件第二次上传会直接从数据库调用。
 + 2020.03.27 重写交互方式，且现已支持`PicGo`中的`web-uploader`插件（Zqian）,配置API地址就写up.php的地址，POST参数填写`pic`
 
