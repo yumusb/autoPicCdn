@@ -26,6 +26,15 @@
 > define("USER","yumusb");//必须是当前GitHub用户名
 > define("MAIL","yumusb@foxmail.com");//
 > define("TOKEN","YourToken");
+>## 数据库配置（添加了统计上传文件功能，使用mysql存储）
+>$database = array(
+>		'dbname' => 'pic',
+>		'host' => 'localhost',
+>		'port' => 3306,
+>		'user' => 'pic',
+>		'pass' => '123456',
+>	);
+>$table = 'remote_imgs'; //存放数据表名字
 > ```
 就可以享受白嫖带来的乐趣了!  
 
