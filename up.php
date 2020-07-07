@@ -8,32 +8,60 @@
  */
 /*
 URL https://github.com/yumusb/autoPicCdn
+
+注意事项：
+1. php中开启 Curl扩展
+2. 如果使用github，则服务器需要能和https://api.github.com正常通信。（建议放到国外 http://renzhijia.com/buy/index/7/?yumu 美国免费空间推荐 优惠码 free2 ）
+3. 如果使用Gitee，请保证 上传的文件 遵循国内法律
+4. 懒的搭建或者不会搭建，就直接用 http://chuibi.cn/
+5. 本源码已经开启智能AI授权模式，请到 http://33.al/donate 打赏5元以后 再开始配置
 */
 
 error_reporting(0);
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set("PRC");
-define("REPO","testforapi");//必须是下面用户名下的公开仓库
-define("USER","yumusb");//必须是当前GitHub用户名
-define("MAIL","yumusb@foxmail.com");//
-define("TOKEN","YourToken");//https://github.com/settings/tokens 去这个页面生成一个有写权限的token（repo：Full control of private repositories 和write:packages前打勾）
+
+
+if(!is_callable('curl_init')){
+    $return['code'] = 500;
+    $return['msg'] = "服务器不支持Curl扩展";
+    $return['url'] = null;
+    die(json_encode($return));
+}
+
+//必选项
+define("TYPE","GITHUB");//选择github
+//define("TYPE","GITEE");//选择gitee，如果使用gitee，需要手动建立master分支，可以看这里 https://gitee.com/help/articles/4122
+
+define("USER","pic-cdn");//你的GitHub/Gitee的用户名
+
+define("REPO","cdn2");//必须是上面用户名下的 公开仓库
+
+define("MAIL","yumusb@foxmail.com");//邮箱无所谓，随便写
+
+define("TOKEN","213");
+// Github 去这个页面 https://github.com/settings/tokens生成一个有写权限的token（repo：Full control of private repositories 和write:packages前打勾）
+// gitee  去往这个页面 https://gitee.com/personal_access_tokens
 
 //数据库配置文件
+//请确保把当前目录下的 pic.sql 导入到你的数据库
 $database = array(
-        'dbname' => 'pic',
+        'dbname' => 'YourDbName',//你的数据库名字
         'host' => 'localhost',
         'port' => 3306,
-        'user' => 'pic',
-        'pass' => '123456',
+        'user' => 'YourDbUser',//你的数据库用户名
+        'pass' => 'YourDbPass',//你的数据库用户名对应的密码
     );
     
 
 $table = 'remote_imgs'; //表名字
 
-/* 创建表
-CREATE TABLE `pic`.`remote_imgs` ( `imgmd5` VARCHAR(32) NOT NULL COMMENT '文件md5' , `imguploadtime` INT(10) NOT NULL COMMENT '上传时间，10位时间戳' , `imguploadip` VARCHAR(20) NOT NULL COMMENT '上传IP' , `imgurl` VARCHAR(200) NOT NULL COMMENT '远程访问URL' , PRIMARY KEY (`imgmd5`)) ENGINE = InnoDB COMMENT = '图片统计表';
-*/
-
+if(TYPE!=="GITHUB" || TYPE!=="GITEE"){
+    $return['code'] = 500;
+    $return['msg'] = "Baby，你要传到哪里呢？";
+    $return['url'] = null;
+    die(json_encode($return));
+}
 try {
     $db = new PDO("mysql:dbname=" . $database['dbname'] . ";host=" . $database['host'] . ";" . "port=" . $database['port'] . ";", $database['user'], $database['pass'], array(PDO::MYSQL_ATTR_INIT_COMMAND => "set names utf8"));
 } catch (PDOException $e) {
@@ -57,8 +85,9 @@ function GetIP(){
 	$ip = "unknow"; 
 	return($ip); 
 }
-function upload($url, $content)
-{
+function upload_github($filename, $content)
+{   
+    $url = "https://api.github.com/repos/" . USER . "/" . REPO . "/contents/" . $filename;
     $ch = curl_init();
     $defaultOptions=[
         CURLOPT_URL => $url,
@@ -86,9 +115,38 @@ function upload($url, $content)
     return $chContents;
 }
 
+function upload_gitee($filename, $content)
+{   
+    $url = "https://gitee.com/api/v5/repos/". USER ."/". REPO ."/contents/".$filename;
+    $ch = curl_init();
+    $defaultOptions=[
+        CURLOPT_URL => $url,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST=>"POST",
+        CURLOPT_POSTFIELDS=>[
+            "access_token"=>TOKEN,
+            "message"=>"uploadfile",
+            "content"=> $content,
+            "owner"=>USER,
+            "repo"=>REPO,
+            "path"=>$filename,
+            "branch"=>"master"
+        ],
+        CURLOPT_HTTPHEADER => [
+            "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language:zh-CN,en-US;q=0.7,en;q=0.3",
+            "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36"
+        ],
+    ];
+    curl_setopt_array($ch, $defaultOptions);
+    $chContents = curl_exec($ch);
+    curl_close($ch);
+    return $chContents;
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_FILES["pic"]["error"] <= 0 && $_FILES["pic"]["size"] >100 ) {
     $filename = date('Y') . '/' . date('m') . '/' . date('d') . '/' . md5(time().mt_rand(10,1000)) . ".png";
-    $url = "https://api.github.com/repos/" . USER . "/" . REPO . "/contents/" . $filename;
     $tmpName = './tmp' . md5($filename);
     move_uploaded_file($_FILES['pic']['tmp_name'], $tmpName);
     $filemd5 = md5_file($tmpName);
@@ -97,9 +155,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_FILES["pic"]["error"] <= 0 && $_FI
     	$remoteimg=$row['imgurl'];
     }else{
     	$content = base64_encode(file_get_contents($tmpName));
-    	$res = json_decode(upload($url, $content), true);
+    	
+    	if(TYPE==="GITHUB"){
+    	    $res = json_decode(upload_github($filename, $content), true);
+    	}
+    	else{
+    	    $res = json_decode(upload_gitee($filename, $content), true);
+    	}
+    	
 		if($res['content']['path'] != ""){
-			$remoteimg = 'https://cdn.jsdelivr.net/gh/' . USER . '/' . REPO . '@latest/' . $res['content']['path'];
+		    if(TYPE==="GITHUB"){
+    	        $remoteimg = 'https://cdn.jsdelivr.net/gh/' . USER . '/' . REPO . '@latest/' . $res['content']['path'];
+        	}
+        	else{
+        	    $remoteimg = $res['content']['download_url'];
+        	}
 	    	$tmp = $db->prepare("INSERT INTO `{$table}`(`imgmd5`, `imguploadtime`, `imguploadip`,`imgurl`) VALUES (?,?,?,?)");
 	    	$tmp->execute(array($filemd5, time(), GetIP(), $remoteimg));
 		}
