@@ -56,7 +56,7 @@ $database = array(
 
 $table = 'remote_imgs'; //表名字
 
-if(TYPE!=="GITHUB" || TYPE!=="GITEE"){
+if(TYPE!=="GITHUB" && TYPE!=="GITEE"){
     $return['code'] = 500;
     $return['msg'] = "Baby，你要传到哪里呢？";
     $return['url'] = null;
