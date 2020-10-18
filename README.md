@@ -81,7 +81,7 @@ $table = 'remote_imgs'; //表名字
 
 + 2020.10.16 
 
-  添加gitee线上版本，详情见 https://chuibi.cn/ 。 
+  添加gitee线上版本，详情见 https://chuibi.net/ 。 
 
 + 2020.07.07
 
