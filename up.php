@@ -73,17 +73,24 @@ try {
 
 
 function GetIP(){ 
-	if (getenv("HTTP_CLIENT_IP") && strcasecmp(getenv("HTTP_CLIENT_IP"), "unknown")) 
-	$ip = getenv("HTTP_CLIENT_IP"); 
-	else if (getenv("HTTP_X_FORWARDED_FOR") && strcasecmp(getenv("HTTP_X_FORWARDED_FOR"), "unknown")) 
-	$ip = getenv("HTTP_X_FORWARDED_FOR"); 
-	else if (getenv("REMOTE_ADDR") && strcasecmp(getenv("REMOTE_ADDR"), "unknown")) 
-	$ip = getenv("REMOTE_ADDR"); 
-	else if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], "unknown")) 
-	$ip = $_SERVER['REMOTE_ADDR']; 
-	else
-	$ip = "unknow"; 
-	return($ip); 
+	if(getenv('HTTP_CLIENT_IP')&&strcasecmp(getenv('HTTP_CLIENT_IP'),'unknown')) 
+	{
+		$ip=getenv('HTTP_CLIENT_IP');
+	} 
+	elseif(getenv('HTTP_X_FORWARDED_FOR')&&strcasecmp(getenv('HTTP_X_FORWARDED_FOR'),'unknown'))
+	{
+		$ip=getenv('HTTP_X_FORWARDED_FOR');
+	}
+	elseif(getenv('REMOTE_ADDR')&&strcasecmp(getenv('REMOTE_ADDR'),'unknown'))
+	{
+		$ip=getenv('REMOTE_ADDR');
+	}
+	elseif(isset($_SERVER['REMOTE_ADDR'])&&$_SERVER['REMOTE_ADDR']&&strcasecmp($_SERVER['REMOTE_ADDR'],'unknown'))
+	{
+		$ip=$_SERVER['REMOTE_ADDR'];
+	}
+	$ip=addslashes(preg_replace("/^([\d\.]+).*/","\\1",$ip));
+	return $ip;
 }
 function upload_github($filename, $content)
 {   
@@ -95,7 +102,7 @@ function upload_github($filename, $content)
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_CUSTOMREQUEST=>"PUT",
         CURLOPT_POSTFIELDS=>json_encode([
-            "message"=>"uploadfile",
+            "message"=>"upload By autoPicCdn",
             "committer"=> [
                 "name"=> USER,
                 "email"=>MAIL,
@@ -126,7 +133,7 @@ function upload_gitee($filename, $content)
         CURLOPT_CUSTOMREQUEST=>"POST",
         CURLOPT_POSTFIELDS=>[
             "access_token"=>TOKEN,
-            "message"=>"uploadfile",
+            "message"=>"upload By autoPicCdn",
             "content"=> $content,
             "owner"=>USER,
             "repo"=>REPO,
@@ -165,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_FILES["pic"]["error"] <= 0 && $_FI
     	
 		if($res['content']['path'] != ""){
 		    if(TYPE==="GITHUB"){
-    	        $remoteimg = 'https://cdn.jsdelivr.net/gh/' . USER . '/' . REPO . '@latest/' . $res['content']['path'];
+    	        $remoteimg = 'https://cdn.jsdelivr.net/gh/' . USER . '/' . REPO . '@'.$res['commit']['sha'].'/' . $res['content']['path'];
         	}
         	else{
         	    $remoteimg = $res['content']['download_url'];

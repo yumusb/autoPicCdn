@@ -79,6 +79,10 @@ $table = 'remote_imgs'; //表名字
 
 # 更新记录:  
 
++ 2020.10.25 
+
+  Github上传的文件生成CDN链接不再采用branch参数，而是直接调用Push后的sha值。解决了仓库大小限制问题【已经通过chuibi.cn在线测试】与Github不再使用master分支的问题。
+
 + 2020.10.16 
 
   添加gitee线上版本，详情见 https://chuibi.net/ 。 
