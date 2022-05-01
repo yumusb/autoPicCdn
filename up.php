@@ -11,7 +11,7 @@ URL https://github.com/yumusb/autoPicCdn
 
 注意事项：
 1. php中开启 Curl扩展
-2. 如果使用github，则服务器需要能和https://api.github.com正常通信。（建议放到国外 http://renzhijia.com/buy/index/7/?yumu 美国免费空间推荐 优惠码 free2 ）
+2. 如果使用github，则服务器需要能和https://api.github.com正常通信。
 3. 如果使用Gitee，请保证 上传的文件 遵循国内法律
 4. 懒的搭建或者不会搭建，就直接用 http://chuibi.cn/
 5. 本源码已经开启智能AI授权模式，请到 http://33.al/donate 打赏5元以后 再开始配置
@@ -172,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_FILES["pic"]["error"] <= 0 && $_FI
     	
 		if($res['content']['path'] != ""){
 		    if(TYPE==="GITHUB"){
-    	        $remoteimg = 'https://cdn.jsdelivr.net/gh/' . USER . '/' . REPO . '@'.$res['commit']['sha'].'/' . $res['content']['path'];
+    	        $remoteimg = 'https://cdn.yecvip.cn/gh/' . USER . '/' . REPO . '@'.$res['commit']['sha'].'/' . $res['content']['path'];
         	}
         	else{
         	    $remoteimg = $res['content']['download_url'];
